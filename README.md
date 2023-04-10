@@ -4,6 +4,8 @@ Emacs package to open a file on a git remote. Inspired by [git-open](https://git
 
 ## Usage
 
+### Interactive File Functions
+
 From the current buffer, call the function to open file on remote to open in browser:
 
 ```el
@@ -16,8 +18,18 @@ To simply copy the remote file path to clipboard, call:
 M-x git-open-copy
 ```
 
-Both `git-open` and `git-open-copy` will open the file by default, but if a region is
-selected, then that range of lines will be highlighted on the remote.
+To view the blame view on the remote, call:
+```el
+M-x git-open-blame
+```
+
+`git-open-blame` also has a copy function instead of opening in browser: `git-open-blame-copy`.
+
+Both `git-open` and `git-open-blame`, and their respective copy functions, will open the file by default,
+but if a region is selected, then that range of lines will be highlighted on the remote.
+
+
+### Interactive Functions from `magit-blame` View
 
 
 `emacs-git-open` similarly allows you to open the current commit from a `magit-blame` buffer:

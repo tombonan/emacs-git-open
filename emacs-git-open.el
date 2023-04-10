@@ -37,6 +37,7 @@
 ;; * Initial release for Github remotes via Magit
 ;; * Added `git-open` and `git-open-copy` to open/copy files on remote
 ;; * Added `git-open-commit` and `git-open-commit-copy` to open/copy commit from magit-blame buffer
+;; * Added `git-open-blame` and copy function to open blame views on remote
 ;;
 
 ;;; Code:
@@ -67,9 +68,13 @@
          (parsed-url (replace-regexp-in-string "\\.git$" "" parsed-url)))
     parsed-url))
 
-(defun emacs-git-open--remote-file-url ()
-  (let* ((remote-url (emacs-git-open--parse-remote (emacs-git-open--remote-url)))
-         (remote-url (concat remote-url "/blob/" (emacs-git-open--current-branch) "/" (emacs-git-open--relative-file-path))))
+(defun emacs-git-open--remote-file-url (&optional path-type)
+  "URL of the remote file.
+   Accepts an option path-type that will allow other views besides the git blob view.
+   Defaults to 'blob' if none is passed."
+  (let* ((path-type (or path-type "blob"))
+         (remote-url (emacs-git-open--parse-remote (emacs-git-open--remote-url)))
+         (remote-url (concat remote-url "/" path-type "/" (emacs-git-open--current-branch) "/" (emacs-git-open--relative-file-path))))
     (if (region-active-p)
         (let ((start-line (line-number-at-pos (region-beginning)))
               (end-line (line-number-at-pos (region-end))))
@@ -97,6 +102,20 @@
   "Copy link to current buffer file on remote"
   (interactive)
   (let ((remote-file-url (emacs-git-open--remote-file-url)))
+    (kill-new remote-file-url)
+    (message "%s copied to clipboard." remote-file-url)))
+
+;;;###autoload
+(defun git-open-blame ()
+  "Open link to blame of current buffer file on remote in browser"
+  (interactive)
+  (browse-url (emacs-git-open--remote-file-url "blame")))
+
+;;;###autoload
+(defun git-open-blame-copy ()
+  "Copy link to blame of current buffer file"
+  (interactive)
+  (let ((remote-file-url (emacs-git-open--remote-file-url "blame")))
     (kill-new remote-file-url)
     (message "%s copied to clipboard." remote-file-url)))
 
