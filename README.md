@@ -1,3 +1,5 @@
+[![Build Status](https://github.com/tombonan/emacs-git-open/workflows/CI/badge.svg)](https://github.com/tombonan/emacs-git-open/actions)
+
 # emacs-git-open
 
 Emacs package to open a file on a git remote. Inspired by [git-open](https://github.com/paulirish/git-open)
