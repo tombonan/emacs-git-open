@@ -27,6 +27,12 @@
     (stub emacs-git-open--relative-file-path => "README.md")
     (should (equal "https://github.com/tombonan/emacs-git-open/blame/main/README.md" (emacs-git-open--remote-file-url "blame")))))
 
+(ert-deftest emacs-git-open--remote-file-url-test-branch-name ()
+  (with-mock
+    (stub emacs-git-open--parse-remote => "https://github.com/tombonan/emacs-git-open")
+    (stub emacs-git-open--relative-file-path => "README.md")
+    (should (equal "https://github.com/tombonan/emacs-git-open/blob/master/README.md" (emacs-git-open--remote-file-url nil "master")))))
+
 (ert-deftest emacs-git-open--remote-file-url-test-with-region ()
   (with-mock
     (stub emacs-git-open--parse-remote => "https://github.com/tombonan/emacs-git-open")

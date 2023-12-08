@@ -48,6 +48,12 @@
   :type 'string
   :group 'emacs-git-open)
 
+(defun emacs-git-open--default-branch ()
+  (let ((branch-name (magit-get "init.defaultBranch")))
+    (if (not branch-name)
+        "main"
+      branch-name)))
+
 (defun emacs-git-open--relative-file-path ()
   (file-relative-name buffer-file-name (magit-toplevel)))
 
@@ -68,13 +74,14 @@
          (parsed-url (replace-regexp-in-string "\\.git$" "" parsed-url)))
     parsed-url))
 
-(defun emacs-git-open--remote-file-url (&optional path-type)
+(defun emacs-git-open--remote-file-url (&optional path-type branch-name)
   "URL of the remote file.
    Accepts an option path-type that will allow other views besides the git blob view.
    Defaults to 'blob' if none is passed."
   (let* ((path-type (or path-type "blob"))
+         (branch-name (or branch-name (emacs-git-open--default-branch)))
          (remote-url (emacs-git-open--parse-remote (emacs-git-open--remote-url)))
-         (remote-url (concat remote-url "/" path-type "/" (emacs-git-open--current-branch) "/" (emacs-git-open--relative-file-path))))
+         (remote-url (concat remote-url "/" path-type "/" branch-name "/" (emacs-git-open--relative-file-path))))
     (if (region-active-p)
         (let ((start-line (line-number-at-pos (region-beginning)))
               (end-line (line-number-at-pos (region-end))))
@@ -102,6 +109,20 @@
   "Copy link to current buffer file on remote"
   (interactive)
   (let ((remote-file-url (emacs-git-open--remote-file-url)))
+    (kill-new remote-file-url)
+    (message "%s copied to clipboard." remote-file-url)))
+
+;;;###autoload
+(defun git-open-current-branch ()
+  "Open link to current buffer file on remote in browser"
+  (interactive)
+  (browse-url (emacs-git-open--remote-file-url nil (emacs-git-open--current-branch))))
+
+;;;###autoload
+(defun git-open-current-branch-copy ()
+  "Copy link to current buffer file on remote"
+  (interactive)
+  (let ((remote-file-url (emacs-git-open--remote-file-url nil (emacs-git-open--current-branch))))
     (kill-new remote-file-url)
     (message "%s copied to clipboard." remote-file-url)))
 
