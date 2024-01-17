@@ -42,6 +42,19 @@ M-x git-open-commit
 
 <img src="./git-open-commit-usage.gif" alt="Git Open Commit Usage" width="500" height="600">
 
+### Default Branches
+
+My typical workflow involves wanting to open up remote files from the default remote branch, either
+to link them to others or to view unmodified files.
+
+By default, this branch is assumed to be `main`, but it can also be configured on a per-project
+basis by editing `.git/config`:
+
+```bash
+[init]
+    defaultBranch = some-default
+```
+
 ### Todo
 - Support remote targets other than 'origin'
 - Support other git hosting services (gitlab, bitbucket etc.)
