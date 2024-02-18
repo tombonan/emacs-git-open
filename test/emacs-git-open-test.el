@@ -16,33 +16,35 @@
 (ert-deftest emacs-git-open--remote-file-url-test ()
   (with-mock
     (stub emacs-git-open--parse-remote => "https://github.com/tombonan/emacs-git-open")
-    (stub emacs-git-open--current-branch => "main")
     (stub emacs-git-open--relative-file-path => "README.md")
-    (should (equal "https://github.com/tombonan/emacs-git-open/blob/main/README.md" (emacs-git-open--remote-file-url)))))
+    (stub emacs-git-open--get-latest-sha => "1c0ad582e81748d38dfe1f1e1c9f43a96d39613a")
+    (should
+     (equal "https://github.com/tombonan/emacs-git-open/blob/1c0ad582e81748d38dfe1f1e1c9f43a96d39613a/README.md"
+            (emacs-git-open--remote-file-url)))))
 
-(ert-deftest emacs-git-open--remote-file-url-test-path-type ()
+(ert-deftest emacs-git-open--remote-file-url-test-view-mode ()
   (with-mock
     (stub emacs-git-open--parse-remote => "https://github.com/tombonan/emacs-git-open")
-    (stub emacs-git-open--current-branch => "main")
     (stub emacs-git-open--relative-file-path => "README.md")
     (should (equal "https://github.com/tombonan/emacs-git-open/blame/main/README.md" (emacs-git-open--remote-file-url "blame")))))
 
-(ert-deftest emacs-git-open--remote-file-url-test-branch-name ()
+(ert-deftest emacs-git-open--remote-file-url-test-tree-path ()
   (with-mock
     (stub emacs-git-open--parse-remote => "https://github.com/tombonan/emacs-git-open")
     (stub emacs-git-open--relative-file-path => "README.md")
-    (should (equal "https://github.com/tombonan/emacs-git-open/blob/master/README.md" (emacs-git-open--remote-file-url nil "master")))))
+    (should (equal "https://github.com/tombonan/emacs-git-open/blob/master/README.md"
+                   (emacs-git-open--remote-file-url nil "master")))))
 
 (ert-deftest emacs-git-open--remote-file-url-test-with-region ()
   (with-mock
     (stub emacs-git-open--parse-remote => "https://github.com/tombonan/emacs-git-open")
-    (stub emacs-git-open--current-branch => "main")
     (stub emacs-git-open--relative-file-path => "README.md")
     (stub region-active-p => t)
     (stub line-number-at-pos => 16)
     (stub region-beginning => 16)
     (stub region-end => 16)
-    (should (equal "https://github.com/tombonan/emacs-git-open/blob/main/README.md#L16-L16" (emacs-git-open--remote-file-url)))))
+    (should (equal "https://github.com/tombonan/emacs-git-open/blob/main/README.md#L16-L16"
+                   (emacs-git-open--remote-file-url)))))
 
 ;; Error handling
 (expectations

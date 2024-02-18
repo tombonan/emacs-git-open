@@ -44,7 +44,7 @@ M-x git-open-commit
 
 ### Default Branches
 
-My typical workflow involves wanting to open up remote files from the default remote branch, either
+My typical workflow often involves wanting to open up remote files from the default remote branch, either
 to link them to others or to view unmodified files.
 
 By default, this branch is assumed to be `main`, but it can also be configured on a per-project
