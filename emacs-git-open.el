@@ -127,13 +127,13 @@
 (defun git-open-default-branch ()
   "Open link to current buffer file on remote in browser for the default branch"
   (interactive)
-  (browse-url (emacs-git-open--remote-file-url nil (emacs-git-open--default-branch))))
+  (browse-url (emacs-git-open--remote-file-url "blob" (emacs-git-open--default-branch))))
 
 ;;;###autoload
 (defun git-open-default-branch-copy ()
   "Copy link to current buffer file on remote for default branch"
   (interactive)
-  (let ((remote-file-url (emacs-git-open--remote-file-url nil (emacs-git-open--current-branch))))
+  (let ((remote-file-url (emacs-git-open--remote-file-url "blob" (emacs-git-open--default-branch))))
     (kill-new remote-file-url)
     (message "%s copied to clipboard." remote-file-url)))
 
@@ -141,13 +141,13 @@
 (defun git-open-current-branch ()
   "Open link to current buffer file on remote in browser for the current branch"
   (interactive)
-  (browse-url (emacs-git-open--remote-file-url nil (emacs-git-open--current-branch))))
+  (browse-url (emacs-git-open--remote-file-url "blob" (emacs-git-open--current-branch))))
 
 ;;;###autoload
 (defun git-open-current-branch-copy ()
   "Copy link to current buffer file on remote for the current branch"
   (interactive)
-  (let ((remote-file-url (emacs-git-open--remote-file-url nil (emacs-git-open--current-branch))))
+  (let ((remote-file-url (emacs-git-open--remote-file-url "blob" (emacs-git-open--current-branch))))
     (kill-new remote-file-url)
     (message "%s copied to clipboard." remote-file-url)))
 
@@ -167,8 +167,8 @@
 
 ;;;###autoload
 (defun git-open-commit ()
+  "Open link to commit from a magit-blame buffer in browser."
   (interactive)
-  "Open link to commit from a magit-blame buffer in browser"
   (browse-url (emacs-git-open--commit-url)))
 
 ;;;###autoload
