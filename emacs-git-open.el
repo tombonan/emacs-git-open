@@ -5,7 +5,7 @@
 ;; Version: 0.2.0
 ;; Keywords: git, github
 ;; URL: https://github.com/tombonan/emacs-git-open
-;; Package-Requires: ((emacs "24.3") (magit "3.0.0"))
+;; Package-Requires: ((emacs "28.1") (magit "3.0.0"))
 
 ;; This file is NOT part of GNU Emacs.
 
