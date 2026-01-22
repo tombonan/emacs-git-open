@@ -1,6 +1,13 @@
-;;; emacs-git-open-test.el --- Tests for emacs-git-open
+;;; emacs-git-open-test.el --- Tests for emacs-git-open  -*- lexical-binding: t -*-
 
 (require 'emacs-git-open)
+(require 'eieio)
+
+;; Mock class for testing magit-blame-chunk functionality
+(defclass emacs-git-open-test--mock-blame-chunk ()
+  ((orig-rev :initarg :orig-rev
+             :documentation "The original revision SHA."))
+  "Mock blame chunk for testing.")
 
 (ert-deftest emacs-git-open--parse-remote-test ()
   (should (equal "https://github.com/tombonan/emacs-git-open"
@@ -65,6 +72,19 @@
     (stub emacs-git-open--current-branch => "feature-branch")
     (mock (browse-url "https://github.com/tombonan/emacs-git-open/blob/feature-branch/README.md"))
     (git-open-current-branch)))
+
+(ert-deftest emacs-git-open--get-commit-sha-test ()
+  (with-mock
+    (stub magit-current-blame-chunk =>
+          (emacs-git-open-test--mock-blame-chunk :orig-rev "2bc16018bdc5236792805abd9f545b61d67d8460"))
+    (should (equal "2bc16018bdc5236792805abd9f545b61d67d8460" (emacs-git-open--get-commit-sha)))))
+
+(ert-deftest emacs-git-open--commit-url-test ()
+  (with-mock
+    (stub emacs-git-open--parse-remote => "https://github.com/tombonan/emacs-git-open")
+    (stub emacs-git-open--get-commit-sha => "1726757d97bc5b5db958b3437287eb765c6f57ef")
+    (should (equal "https://github.com/tombonan/emacs-git-open/commit/1726757d97bc5b5db958b3437287eb765c6f57ef"
+                   (emacs-git-open--commit-url)))))
 
 ;; Error handling
 (ert-deftest emacs-git-open--current-branch-error-test ()
