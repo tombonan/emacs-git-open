@@ -109,6 +109,11 @@
   (let ((remote-url (emacs-git-open--parse-remote (emacs-git-open--remote-url))))
     (concat remote-url "/commit/" (emacs-git-open--get-commit-sha))))
 
+(defun emacs-git-open--copy-url (url)
+  "Copy URL to the kill ring and display a message."
+  (kill-new url)
+  (message "%s copied to clipboard." url))
+
 ;;;###autoload
 (defun git-open ()
   "Open link to current buffer file on remote in browser"
@@ -119,9 +124,7 @@
 (defun git-open-copy ()
   "Copy link to current buffer file on remote"
   (interactive)
-  (let ((remote-file-url (emacs-git-open--remote-file-url "blob")))
-    (kill-new remote-file-url)
-    (message "%s copied to clipboard." remote-file-url)))
+  (emacs-git-open--copy-url (emacs-git-open--remote-file-url "blob")))
 
 ;;;###autoload
 (defun git-open-default-branch ()
@@ -133,9 +136,7 @@
 (defun git-open-default-branch-copy ()
   "Copy link to current buffer file on remote for default branch"
   (interactive)
-  (let ((remote-file-url (emacs-git-open--remote-file-url "blob" (emacs-git-open--default-branch))))
-    (kill-new remote-file-url)
-    (message "%s copied to clipboard." remote-file-url)))
+  (emacs-git-open--copy-url (emacs-git-open--remote-file-url "blob" (emacs-git-open--default-branch))))
 
 ;;;###autoload
 (defun git-open-current-branch ()
@@ -147,9 +148,7 @@
 (defun git-open-current-branch-copy ()
   "Copy link to current buffer file on remote for the current branch"
   (interactive)
-  (let ((remote-file-url (emacs-git-open--remote-file-url "blob" (emacs-git-open--current-branch))))
-    (kill-new remote-file-url)
-    (message "%s copied to clipboard." remote-file-url)))
+  (emacs-git-open--copy-url (emacs-git-open--remote-file-url "blob" (emacs-git-open--current-branch))))
 
 ;;;###autoload
 (defun git-open-blame ()
@@ -161,9 +160,7 @@
 (defun git-open-blame-copy ()
   "Copy link to blame of current buffer file"
   (interactive)
-  (let ((remote-file-url (emacs-git-open--remote-file-url "blame" (emacs-git-open--default-branch))))
-    (kill-new remote-file-url)
-    (message "%s copied to clipboard." remote-file-url)))
+  (emacs-git-open--copy-url (emacs-git-open--remote-file-url "blame" (emacs-git-open--default-branch))))
 
 ;;;###autoload
 (defun git-open-commit ()
@@ -175,9 +172,7 @@
 (defun git-open-commit-copy ()
   "Copy link to commit from a magit-blame buffer"
   (interactive)
-  (let ((remote-commit-url (emacs-git-open--commit-url)))
-    (kill-new remote-commit-url)
-    (message "%s copied to clipboard." remote-commit-url)))
+  (emacs-git-open--copy-url (emacs-git-open--commit-url)))
 
 (provide 'emacs-git-open)
 ;;; emacs-git-open.el ends here
