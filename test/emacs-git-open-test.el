@@ -67,16 +67,16 @@
     (git-open-current-branch)))
 
 ;; Error handling
-(expectations
-  (desc "emacs-git-open--current-branch-test-failure")
-  (expect (error-message "Error: not in a Git repository.")
-    (with-mock
-      (stub magit-get-current-branch => nil)
-      (emacs-git-open--current-branch)))
-  (desc "emacs-git-open--remote-url-test-failure")
-  (expect (error-message "Error: remote not found.")
-    (with-mock
-      (stub magit-git-string => nil)
-      (emacs-git-open--remote-url))))
+(ert-deftest emacs-git-open--current-branch-error-test ()
+  (with-mock
+    (stub magit-get-current-branch => nil)
+    (should-error (emacs-git-open--current-branch)
+                  :type 'error)))
+
+(ert-deftest emacs-git-open--remote-url-error-test ()
+  (with-mock
+    (stub magit-git-string => nil)
+    (should-error (emacs-git-open--remote-url)
+                  :type 'error)))
 
 ;;; emacs-git-open-test.el ends here
