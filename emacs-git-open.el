@@ -33,6 +33,10 @@
 
 ;;; Change Log:
 ;;
+;; 2026-01-21 - v0.3.0
+;; * Modernize tests
+;; * Bump magit and supported emacs versions
+;;
 ;; 2024-02-18 - v0.2.0
 ;; * Open the tree path of the most-recent file commit by default
 ;;
