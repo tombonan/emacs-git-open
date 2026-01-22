@@ -33,7 +33,7 @@
 
 ;;; Change Log:
 ;;
-;; 2024-02-018 - v0.2.0
+;; 2024-02-18 - v0.2.0
 ;; * Open the tree path of the most-recent file commit by default
 ;;
 ;; 2023-04-04 - v0.1.0
@@ -46,45 +46,57 @@
 ;;; Code:
 (require 'magit)
 
+(defgroup emacs-git-open nil
+  "Open files and commits on GitHub from Emacs."
+  :group 'tools
+  :group 'vc
+  :prefix "emacs-git-open-")
+
 (defcustom emacs-git-open-default-remote "origin"
   "Name of the remote to link to."
   :type 'string
   :group 'emacs-git-open)
 
 (defun emacs-git-open--default-branch ()
+  "Return the default branch name from git config, or \"main\" if not set."
   (let ((branch-name (magit-get "init.defaultBranch")))
     (if (not branch-name)
         "main"
       branch-name)))
 
 (defun emacs-git-open--relative-file-path ()
+  "Return the current buffer's file path relative to the repository root."
   (file-relative-name buffer-file-name (magit-toplevel)))
 
 (defun emacs-git-open--current-branch ()
+  "Return the current git branch name.
+Signal an error if not in a git repository."
   (let ((current-branch (magit-get-current-branch)))
     (if (not current-branch)
-        (error "Error: not in a Git repository.")
+        (error "Not in a git repository")
       current-branch)))
 
 (defun emacs-git-open--remote-url ()
+  "Return the URL of the configured remote.
+Signal an error if the remote is not found."
   (let ((remote-url (magit-git-string "config" "--get" (concat "remote." emacs-git-open-default-remote ".url"))))
     (if (not remote-url)
-        (error "Error: remote not found.")
+        (error "Remote '%s' not found" emacs-git-open-default-remote)
       remote-url)))
 
 (defun emacs-git-open--parse-remote (remote-url)
+  "Convert REMOTE-URL to a browser-friendly HTTPS URL."
   (let* ((parsed-url (replace-regexp-in-string "^git@github.com:" "https://github.com/" remote-url))
          (parsed-url (replace-regexp-in-string "\\.git$" "" parsed-url)))
     parsed-url))
 
 (defun emacs-git-open--remote-file-url (&optional view-mode tree-path)
-  "URL of the remote file.
-
-   view-mode (optional): View mode that will allow other views besides the git blob view.
-     e.g. 'blob' or 'blame'. Defaults to 'blob' if no argument is passed.
-   tree-path (optional): Path of the tree for the file. This can either be a branch name
-     or a git commit SHA. Defaults to the most recent SHA of the file if no value is passed.
-  "
+  "Return the URL of the current file on the remote.
+VIEW-MODE specifies the GitHub view type (e.g., \"blob\" or \"blame\").
+Defaults to \"blob\" if not specified.
+TREE-PATH is a branch name or commit SHA.  Defaults to the most recent
+commit SHA of the file if not specified.
+If a region is active, line numbers are appended to the URL."
   (let* ((view-mode (or view-mode "blob"))
          (tree-path (or tree-path (emacs-git-open--get-latest-sha)))
          (remote-url (emacs-git-open--parse-remote (emacs-git-open--remote-url)))
@@ -96,16 +108,15 @@
       remote-url)))
 
 (defun emacs-git-open--get-latest-sha ()
-  "Fetch the most-recent SHA for the current file"
-  (magit-rev-parse-safe "HEAD" (buffer-file-name)))
+  "Return the most recent commit SHA for the current file."
+  (magit-git-string "rev-list" "-1" "HEAD" "--" (buffer-file-name)))
 
 (defun emacs-git-open--get-commit-sha ()
-  "Fetch the commit SHA of the current line in a magit-blame buffer"
-  (interactive)
+  "Return the commit SHA of the current line in a magit-blame buffer."
   (oref (magit-current-blame-chunk) orig-rev))
 
 (defun emacs-git-open--commit-url ()
-  "Opens the commit at the current line from a magit-blame buffer"
+  "Return the URL of the commit at the current line in a magit-blame buffer."
   (let ((remote-url (emacs-git-open--parse-remote (emacs-git-open--remote-url))))
     (concat remote-url "/commit/" (emacs-git-open--get-commit-sha))))
 
@@ -116,49 +127,49 @@
 
 ;;;###autoload
 (defun git-open ()
-  "Open link to current buffer file on remote in browser"
+  "Open the current buffer's file on the remote in a browser."
   (interactive)
   (browse-url (emacs-git-open--remote-file-url "blob")))
 
 ;;;###autoload
 (defun git-open-copy ()
-  "Copy link to current buffer file on remote"
+  "Copy the URL of the current buffer's file on the remote to the kill ring."
   (interactive)
   (emacs-git-open--copy-url (emacs-git-open--remote-file-url "blob")))
 
 ;;;###autoload
 (defun git-open-default-branch ()
-  "Open link to current buffer file on remote in browser for the default branch"
+  "Open the current buffer's file on the remote default branch in a browser."
   (interactive)
   (browse-url (emacs-git-open--remote-file-url "blob" (emacs-git-open--default-branch))))
 
 ;;;###autoload
 (defun git-open-default-branch-copy ()
-  "Copy link to current buffer file on remote for default branch"
+  "Copy the URL of the current file on the remote default branch to the kill ring."
   (interactive)
   (emacs-git-open--copy-url (emacs-git-open--remote-file-url "blob" (emacs-git-open--default-branch))))
 
 ;;;###autoload
 (defun git-open-current-branch ()
-  "Open link to current buffer file on remote in browser for the current branch"
+  "Open the current buffer's file on the remote current branch in a browser."
   (interactive)
   (browse-url (emacs-git-open--remote-file-url "blob" (emacs-git-open--current-branch))))
 
 ;;;###autoload
 (defun git-open-current-branch-copy ()
-  "Copy link to current buffer file on remote for the current branch"
+  "Copy the URL of the current file on the remote current branch to the kill ring."
   (interactive)
   (emacs-git-open--copy-url (emacs-git-open--remote-file-url "blob" (emacs-git-open--current-branch))))
 
 ;;;###autoload
 (defun git-open-blame ()
-  "Open link to blame of current buffer file on remote in browser"
+  "Open the blame view of the current buffer's file on the remote in a browser."
   (interactive)
   (browse-url (emacs-git-open--remote-file-url "blame" (emacs-git-open--default-branch))))
 
 ;;;###autoload
 (defun git-open-blame-copy ()
-  "Copy link to blame of current buffer file"
+  "Copy the blame view URL of the current buffer's file to the kill ring."
   (interactive)
   (emacs-git-open--copy-url (emacs-git-open--remote-file-url "blame" (emacs-git-open--default-branch))))
 
@@ -170,7 +181,7 @@
 
 ;;;###autoload
 (defun git-open-commit-copy ()
-  "Copy link to commit from a magit-blame buffer"
+  "Copy the commit URL from a magit-blame buffer to the kill ring."
   (interactive)
   (emacs-git-open--copy-url (emacs-git-open--commit-url)))
 
